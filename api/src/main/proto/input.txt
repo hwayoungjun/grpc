@@ -1,0 +1,12 @@
+id: 1
+course_name: "Computer Science"
+student {
+  id: 1
+  first_name: "John"
+  last_name: "Doe"
+  email: "john@example.com"
+  phone {
+    number: "123-456-7890"
+    type: MOBILE
+  }
+}
