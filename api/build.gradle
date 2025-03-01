@@ -7,29 +7,62 @@ plugins {
 
 group = 'com.ashenone'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom 'com.google.protobuf:protobuf-bom:4.29.3'
+        mavenBom 'io.grpc:grpc-bom:1.70.0'
+    }
+}
+
+configurations {
+    protoGenerator
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
     implementation 'com.google.protobuf:protobuf-java'
     implementation 'com.google.protobuf:protobuf-java-util'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    implementation 'io.grpc:grpc-netty'
+    implementation 'io.grpc:grpc-protobuf'
+    implementation 'io.grpc:grpc-stub'
+
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-dependencyManagement {
-    imports {
-        mavenBom 'com.google.protobuf:protobuf-bom:4.29.0'
-    }
-}
-
 test {
     useJUnitPlatform()
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:4.29.3'
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.17.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
 }
