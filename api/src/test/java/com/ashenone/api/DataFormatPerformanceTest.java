@@ -3,14 +3,17 @@ package com.ashenone.api;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import com.ashenone.api.config.WebClientTestConfig;
 import com.ashenone.api.domain.Course;
 import com.ashenone.api.proto.BaeldungProto;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
@@ -19,7 +22,11 @@ import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 @SpringBootTest
+@ContextConfiguration(classes = WebClientTestConfig.class)
 public class DataFormatPerformanceTest {
+
+    @Autowired
+    private WebClient webClient;
 
     private static final int THREAD_COUNT = 2000;
 
@@ -28,7 +35,6 @@ public class DataFormatPerformanceTest {
 
     private static BaeldungProto.Course testProtoCourse;
     private static Course testJsonCourse;
-    private static WebClient webClient;
 
     @BeforeAll
     static void setUp() {
@@ -56,8 +62,6 @@ public class DataFormatPerformanceTest {
         Course.Student.PhoneNumber phoneNumber = new Course.Student.PhoneNumber("123456789", Course.Student.PhoneType.MOBILE);
         Course.Student student = new Course.Student(1, "John", "Doe", "john.doe@example.com", List.of(phoneNumber));
         testJsonCourse = new Course(101, "Introduction to Protobuf", List.of(student));
-
-        webClient = WebClient.builder().build();
     }
 
     @Test
@@ -72,7 +76,6 @@ public class DataFormatPerformanceTest {
         long protoEnd = System.nanoTime();
 
         System.out.printf("Protobuf 실행 시간: %.2f초%n", (protoEnd - protoStart) / 1_000_000_000.0);
-
     }
 
     @Test

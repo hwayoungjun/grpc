@@ -5,10 +5,10 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import io.grpc.Server;
+import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.grpc.sample.proto.HelloReply;
 import org.springframework.grpc.sample.proto.HelloRequest;
@@ -23,12 +23,17 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GrpcClientTest {
+
+    @Autowired
+    private Server server;
+
     private ManagedChannel channel;
     private SimpleGrpc.SimpleBlockingStub blockingStub;
     private SimpleGrpc.SimpleStub asyncStub;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         loggerContext.getLogger(Logger.ROOT_LOGGER_NAME).setLevel(Level.INFO);
@@ -43,12 +48,10 @@ public class GrpcClientTest {
         System.out.println("채널 및 스텁 초기화 완료");
     }
 
-    @AfterEach
+    @AfterAll
     void tearDown() {
-        if (channel != null && !channel.isShutdown()) {
-            System.out.println("채널 종료");
-            channel.shutdown();
-        }
+        channel.shutdown();
+        server.shutdown();
     }
 
     @Test

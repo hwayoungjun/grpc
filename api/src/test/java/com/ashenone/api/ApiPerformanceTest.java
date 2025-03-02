@@ -7,6 +7,8 @@ import com.ashenone.proto.UserServiceGrpc;
 import com.google.common.util.concurrent.AtomicDouble;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Server;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -23,13 +25,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest
 @ContextConfiguration(classes = WebClientTestConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ApiPerformanceTest {
 
     @Autowired
+    private Server server;
+
+    @Autowired
     private WebClient webClient;
+
+    private ManagedChannel channel;
 
     private UserServiceGrpc.UserServiceBlockingStub blockingStub;
 
@@ -39,10 +46,16 @@ public class ApiPerformanceTest {
 
     @BeforeAll
     public void setUp() {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090)
+        channel = ManagedChannelBuilder.forAddress("localhost", 9090)
             .usePlaintext()
             .build();
         blockingStub = UserServiceGrpc.newBlockingStub(channel);
+    }
+
+    @AfterAll
+    public void tearDown() {
+        channel.shutdown();
+        server.shutdown();
     }
 
 //    @Test
