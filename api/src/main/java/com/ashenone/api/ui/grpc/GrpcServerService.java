@@ -1,4 +1,4 @@
-package com.ashenone.api.application;
+package com.ashenone.api.ui.grpc;
 
 
 import io.grpc.stub.StreamObserver;

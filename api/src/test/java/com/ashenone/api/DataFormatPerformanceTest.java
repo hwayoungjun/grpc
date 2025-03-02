@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 @SpringBootTest
-public class PerformanceComparisonTest {
+public class DataFormatPerformanceTest {
 
     private static final int THREAD_COUNT = 2000;
 
